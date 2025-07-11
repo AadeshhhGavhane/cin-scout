@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Company CIN Search & Details</title>
+  <style>
+    body { font-family: sans-serif; padding: 2rem; }
+    input { width: 100%; padding: 0.5rem; font-size: 1rem; }
+    .results { margin-top: 1rem; border: 1px solid #ccc; border-radius: 6px; max-height: 500px; overflow-y: auto; }
+    .result-item { padding: 0.5rem; border-bottom: 1px solid #eee; cursor: pointer; }
+    .result-item:last-child { border-bottom: none; }
+    .company-name { font-weight: bold; }
+    .cin { font-size: 0.9rem; color: #555; }
+    .details { margin-top: 0.5rem; padding: 0.5rem; background: #f9f9f9; border-radius: 4px; font-size: 0.9rem; }
+  </style>
+</head>
+<body>
+
+<h2>🔍 Company CIN Lookup</h2>
+<input type="text" id="searchBox" placeholder="Type a company name..." />
+
+<div class="results" id="results"></div>
+
+<script>
+  const searchBox = document.getElementById('searchBox');
+  const resultsDiv = document.getElementById('results');
+  let timeout = null;
+
+  searchBox.addEventListener('input', () => {
+    const query = searchBox.value.trim();
+    clearTimeout(timeout);
+
+    if (query.length < 3) {
+      resultsDiv.innerHTML = '';
+      return;
+    }
+
+    timeout = setTimeout(() => {
+      fetch(`http://localhost:8000/search?q=${encodeURIComponent(query)}`)
+        .then(res => res.json())
+        .then(data => {
+          const entries = data.d;
+          resultsDiv.innerHTML = '';
+
+          entries.forEach(entry => {
+            const [name, cin, listed, state] = entry.split(';');
+
+            const div = document.createElement('div');
+            div.classList.add('result-item');
+            div.dataset.cin = cin;
+            div.innerHTML = `
+              <div class="company-name">${name} (${state})</div>
+              <div class="cin">CIN: ${cin}</div>
+            `;
+
+            // On click, fetch details
+            div.addEventListener('click', () => {
+              // Avoid duplicate details load
+              if (div.querySelector('.details')) return;
+
+              fetch(`http://localhost:8000/details?cin=${cin}`)
+                .then(res => {
+                  if (!res.ok) throw new Error('Details not found');
+                  return res.json();
+                })
+                .then(details => {
+                  const info = document.createElement('div');
+                  info.classList.add('details');
+                  info.innerHTML = `
+                    <div><strong>Legal Name:</strong> ${details.legal_name}</div>
+                    <div><strong>ROC Code:</strong> ${details.roc_code}</div>
+                    <div><strong>Founded:</strong> ${details.founding_date}</div>
+                    <div><strong>Directors:</strong> ${details.directors.join(', ')}</div>
+                  `;
+                  div.appendChild(info);
+                })
+                .catch(err => console.error(err));
+            });
+
+            resultsDiv.appendChild(div);
+          });
+        })
+        .catch(err => {
+          console.error('Error fetching results:', err);
+        });
+    }, 300);
+  });
+</script>
+</body>
+</html>
