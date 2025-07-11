@@ -1,6 +1,6 @@
 # CIN Scout 🔍
 
-A web application for searching and retrieving detailed information about Indian companies using their Corporate Identity Number (CIN).
+FastAPI-powered CIN lookup for Indian companies. Search, extract ROC codes, founding dates & director details from public registries.
 
 ## Features
 
@@ -70,14 +70,14 @@ cin-scout/
 
 ## Dependencies
 
-- FastAPI - Web framework
+- FastAPI - Backend framework
 - BeautifulSoup4 - HTML parsing
 - Requests - HTTP requests
 - Uvicorn - ASGI server
 
 ## Data Sources
 
-- Company Search: [InstaFinancials CIN Finder](https://projects.instafinancials.com/cin-finder/)
+- Company Search: [InstaFinancials CIN Finder](https://www.instafinancials.com/)
 - Company Details: [AllIndiaITR.com](https://www.allindiaitr.com/)
 
 ## Disclaimer
