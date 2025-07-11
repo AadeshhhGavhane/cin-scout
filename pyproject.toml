@@ -1,7 +1,7 @@
 [project]
-name = "legal-name-cin-fetcher"
-version = "0.1.0"
-description = "Add your description here"
+name = "cin-scout"
+version = "1.0.0"
+description = "FastAPI-powered Indian company lookup tool. Search by name, fetch CIN, ROC codes, founding dates & directors from public registries."
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
